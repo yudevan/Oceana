@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSlot
 class BaseForm(QWidget, QHBoxLayout):
     __label = ""
     __val = vars()
+    valueChanged = pyqtSignal(object)
     def __init__(self, parent=None):
         super(BaseForm,self).__init__(parent)
         self.control = QLabel("Default Widget")
@@ -18,7 +19,7 @@ class BaseForm(QWidget, QHBoxLayout):
 
         return property(getter, setter)
     @property
-    def getVal(self):
+    def val(self):
         self.__val =None
         if type(self.control) == QLineEdit:
             self.__val = self.control.text()
@@ -31,9 +32,11 @@ class BaseForm(QWidget, QHBoxLayout):
         else:
             self.__val = self.control.text()
         return self.__val
-    property.setter
-    def setVal(self, val):
-        self.__val = val
+    @val.setter
+    def val(self, val):
+        if self.__val != val:
+            self.__val = val
+            self.valueChanged.emit(val)
     @pyqtSlot()
     def triggered(self):
         yield "Form Triggered"
